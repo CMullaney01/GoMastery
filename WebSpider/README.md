@@ -1,3 +1,4 @@
-# I am maing a web crawler!!!
+# I am making a web crawler!!!
 
-![web crawler image stolen from google](./WebCrawlerScheme.svg)
+This web crawler image was stolen from google
+![web crawler image stolen from google](./images/WebCrawlerScheme.svg)
