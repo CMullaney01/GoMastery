@@ -1,16 +1,16 @@
 package main
 
-type visitedURL struct {
+// URLQueue represents a queue of URLs.
+// URLQueue represents a queue of URLs.
+type URLChanQueue struct {
+	URLch   chan string
 	visited Set
 }
 
-// URLQueue represents a queue of URLs.
-type URLQueue struct {
-	URLs []string
-}
-
-func NewURLQueue(initialURL string) *URLQueue {
-	return &URLQueue{
-		URLs: make([]string, 0),
+func NewURLQueue(initialURL string) *URLChanQueue {
+	visited := make(Set)
+	return &URLChanQueue{
+		URLch:   make(chan string, 32),
+		visited: visited,
 	}
 }
