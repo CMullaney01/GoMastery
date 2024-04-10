@@ -5,5 +5,10 @@ func main() {
 	initialURL := "google.com"
 	urls := NewURLQueue(initialURL)
 
-	Crawl(urls)
+	parser := &DefaultHTMLParser{}
+	fetcher := &DefaultFetcher{}
+
+	Crawl(urls, parser, fetcher)
+
+	close(urls.URLch)
 }

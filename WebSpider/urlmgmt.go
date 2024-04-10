@@ -9,8 +9,10 @@ type URLChanQueue struct {
 
 func NewURLQueue(initialURL string) *URLChanQueue {
 	visited := make(Set)
+	urlch := make(chan string, 32)
+	urlch <- initialURL
 	return &URLChanQueue{
-		URLch:   make(chan string, 32),
+		URLch:   urlch,
 		visited: visited,
 	}
 }

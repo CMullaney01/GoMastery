@@ -10,8 +10,21 @@ import (
 	"golang.org/x/net/html"
 )
 
-// extractURLs parses HTML content and extracts URLs
-func extractURLs(content string, urlch chan<- string) {
+// HTMLParser interface for parsing HTML content
+type HTMLParser interface {
+	ExtractURLs(content string, urlch chan<- string)
+	ParseBody(content string)
+}
+
+// Fetcher interface for fetching web pages -- great for allowing us to use a fake fetcher for testing
+type Fetcher interface {
+	Fetch(url string, urlch chan<- string, parser HTMLParser) (body string, err error)
+}
+
+type DefaultHTMLParser struct{}
+type DefaultFetcher struct{}
+
+func (p *DefaultHTMLParser) ExtractURLs(content string, urlch chan<- string) {
 	tokenizer := html.NewTokenizer(strings.NewReader(content))
 
 	for {
@@ -31,13 +44,12 @@ func extractURLs(content string, urlch chan<- string) {
 	}
 }
 
-func parseBody() {}
+func (p *DefaultHTMLParser) ParseBody(content string) {}
 
-// we want this function to return the body of the website url and all urls in the current body
-func fetch(url string, urlch chan<- string) (body string, err error) {
+// We want this function to return the body of the website and find new URLS adding them to our channel
+func (f *DefaultFetcher) Fetch(url string, urlch chan<- string, parser HTMLParser) (body string, err error) {
 	resp, err := http.Get(url)
 	if err != nil {
-		log.Println(err)
 		return "", err
 	}
 	defer resp.Body.Close()
@@ -49,21 +61,21 @@ func fetch(url string, urlch chan<- string) (body string, err error) {
 	}
 
 	// Parse HTML content to extract URLs
-	extractURLs(string(content), urlch)
+	parser.ExtractURLs(string(content), urlch)
 
 	return string(content), nil
 }
 
 // Given the current url implement Crawling Logic what would be cool is if we could use a llm to process the information in the body
 // Also might be cool to crawl each url in the set and get our favourite urls, assign a class of importance (how many urls reference)
-func Crawl(urls *URLChanQueue) {
+func Crawl(urls *URLChanQueue, parser HTMLParser, fetcher Fetcher) {
 	for url := range urls.URLch {
 		if urls.visited.Contains(url) {
 			continue
 		}
 		urls.visited.Add(url)
 		go func(url string) {
-			body, err := fetch(url, urls.URLch)
+			body, err := fetcher.Fetch(url, urls.URLch, parser)
 			if err != nil {
 				fmt.Println("Error fetching URL:", url, err)
 				return // Skip to the next URL if there's an error
@@ -71,7 +83,7 @@ func Crawl(urls *URLChanQueue) {
 			fmt.Println("URL:", url)
 			fmt.Println("Body:", body)
 		}(url)
-		//prevent infinite crawling
+		//prevent infinite crawling -- only visit 32 URLS
 		if urls.visited.Size() > 32 {
 			break
 		}
