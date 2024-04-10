@@ -1,6 +1,6 @@
 package main
 
-import "playground/jsonapi"
+import "playground/socketchat"
 
 func main() {
 	// goroutines.Goroutine()
@@ -8,5 +8,7 @@ func main() {
 	// ctxgo.Ctxgo()
 	// typedfunc.TypedFunc()
 	// microservice.Microservice()
-	jsonapi.Setup()
+	// jsonapi.Setup()
+	// tcpserver.TCPServer()
+	socketchat.SocketChat()
 }
