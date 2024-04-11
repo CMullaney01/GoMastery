@@ -6,9 +6,10 @@ import (
 	"golang.org/x/net/html"
 )
 
-type DefaultHTMLParser struct{}
+//unlike food parser, we want to implement our own functions for both the parse body and the Extract URLs, this is done here
+type SportHTMLParser struct{}
 
-func (p *DefaultHTMLParser) ExtractURLs(content string, urlch chan<- string) {
+func (p *SportHTMLParser) ExtractURLs(content string, urlch chan<- string) {
 	tokenizer := html.NewTokenizer(strings.NewReader(content))
 
 	for {
@@ -28,8 +29,8 @@ func (p *DefaultHTMLParser) ExtractURLs(content string, urlch chan<- string) {
 	}
 }
 
-func (p *DefaultHTMLParser) ParseBody(content string) {}
+func (p *SportHTMLParser) ParseBody(content string) {}
 
-func NewDefaultParser() HTMLParser {
-	return &DefaultHTMLParser{}
+func NewSportParser() HTMLParser {
+	return &SportHTMLParser{}
 }
