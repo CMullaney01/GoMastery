@@ -1,10 +1,10 @@
-package main
+package types
 
 // URLQueue represents a queue of URLs.
 // URLQueue represents a queue of URLs.
 type URLChanQueue struct {
 	URLch   chan string
-	visited Set
+	Visited Set
 }
 
 func NewURLQueue(initialURL string) *URLChanQueue {
@@ -13,6 +13,6 @@ func NewURLQueue(initialURL string) *URLChanQueue {
 	urlch <- initialURL
 	return &URLChanQueue{
 		URLch:   urlch,
-		visited: visited,
+		Visited: visited,
 	}
 }

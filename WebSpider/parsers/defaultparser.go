@@ -1,16 +1,10 @@
-package main
+package parsers
 
 import (
 	"strings"
 
 	"golang.org/x/net/html"
 )
-
-// HTMLParser interface for parsing HTML content
-type HTMLParser interface {
-	ExtractURLs(content string, urlch chan<- string)
-	ParseBody(content string)
-}
 
 type DefaultHTMLParser struct{}
 

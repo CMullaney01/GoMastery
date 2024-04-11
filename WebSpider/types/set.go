@@ -1,6 +1,12 @@
-package main
+package types
 
+// Set represents a set of strings.
 type Set map[string]struct{}
+
+// NewSet creates and initializes a new set.
+func NewSet() Set {
+	return make(Set)
+}
 
 // Add adds an element to the set.
 func (s Set) Add(item string) {
