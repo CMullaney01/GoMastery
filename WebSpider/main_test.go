@@ -12,8 +12,7 @@ func TestMainCrawl(t *testing.T) {
 	initialURL := "google.com"
 	urls := types.NewURLQueue(initialURL)
 	parser := parsers.NewDefaultParser()
-	fetcher := fetchers.NewFakeFetcher() // Use the mock fetcher
-
+	fetcher := fetchers.NewFakeFetcher() // Use the fake fetcher to get example data
 	// Call the main function
 	Crawl(urls, parser, fetcher)
 
