@@ -4,22 +4,34 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"log"
+	"os"
 )
 
 type MockParser struct {
-	urls []string
+	urls  []string
+	index int
 }
 
 func (p *MockParser) ExtractURLs(content string, urlch chan<- string) {
-	for _, url := range p.urls {
+	end := p.index + 3
+	if end > len(p.urls) {
+		end = len(p.urls)
+	}
+	for _, url := range p.urls[p.index:end] {
 		urlch <- url
 	}
+	p.index = end
 }
 
 func (p *MockParser) ParseBody(content string) {}
 
 func NewMockParser() HTMLParser {
-	urlPath := "./testdata/mockurls.json"
+	currentDir, err := os.Getwd()
+	if err != nil {
+		log.Fatalf("Error getting current directory: %v", err)
+	}
+	log.Printf("Current directory: %s", currentDir)
+	urlPath := "./parsers/testdata/mockurls.json"
 	data, err := ioutil.ReadFile(urlPath)
 	if err != nil {
 		log.Fatalf("Error reading JSON file: %v", err)
@@ -47,6 +59,7 @@ func NewMockParser() HTMLParser {
 	copy(urlSlice, jsonData.URLs)
 
 	return &MockParser{
-		urls: urlSlice,
+		urls:  urlSlice,
+		index: 0,
 	}
 }
