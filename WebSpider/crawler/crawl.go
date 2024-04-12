@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"sync"
+	"time"
 	"webspider/fetchers"
 	"webspider/parsers"
 	"webspider/types"
@@ -16,11 +17,22 @@ func Crawl(urls *types.URLChanQueue, parser parsers.HTMLParser, fetcher fetchers
 
 	// Channel to signal when to stop processing URLs
 	stopCh := make(chan struct{})
+	defer close(stopCh)
 
-	// Flag to keep track of whether the stopCh has been closed
-	var stopChClosed bool
+	// Timeout duration
+	timeoutDuration := time.Second
+
+	// Initialize lastVisited time
+	lastVisited := time.Now()
 
 	for url := range urls.URLch {
+		// Check if timeout duration has passed since the lastVisited time
+		//To Do: This currently doesnt work
+		if time.Since(lastVisited) > timeoutDuration {
+			log.Println("Timeout occurred")
+			stopCh <- struct{}{}
+			break
+		}
 		// Check if the URL has been visited
 		log.Println(url)
 		if urls.Visited.Contains(url) {
@@ -29,17 +41,15 @@ func Crawl(urls *types.URLChanQueue, parser parsers.HTMLParser, fetcher fetchers
 
 		// Check if we've visited 32 URLs
 		if urls.Visited.Size() >= 32 {
-			// Signal to stop processing URLs only if stopCh is not closed
-			if !stopChClosed {
-				fmt.Println("Closed stop")
-				close(stopCh)
-				stopChClosed = true
-			}
+			log.Println("max num Urls visited")
+			// Signal to stop processing URLs
+			stopCh <- struct{}{}
 			break
 		}
 
-		// Add the URL to visited list
+		// Add the URL to visited list and update lastVisited time
 		urls.Visited.Add(url)
+		lastVisited = time.Now()
 
 		wg.Add(1)
 		go func(url string) {

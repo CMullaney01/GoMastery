@@ -15,5 +15,5 @@ func main() {
 
 	crawler.Crawl(urls, parser, fetcher)
 
-	// close(urls.URLch)
+	close(urls.URLch)
 }
